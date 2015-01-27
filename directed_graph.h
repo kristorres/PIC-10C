@@ -47,6 +47,8 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
       // Constructors
       DirectedGraph();
+      explicit DirectedGraph(const size_t& n);
+      DirectedGraph(const size_t& n, const T& val);
       DirectedGraph(const std::vector<T>& v);
       DirectedGraph(const std::initializer_list<T> il);
       DirectedGraph(const DirectedGraph& rhs);
@@ -150,8 +152,6 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     * the fundamental units of which graphs are formed. In a diagram of a graph,
     * nodes are labeled with extra information that enables it to be
     * distinguished from other nodes.
-    *
-    * @author Kris Torres
     */
    template<typename T>
    class DirectedGraph<T>::Node final
@@ -159,7 +159,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    public:
       
       // Constructor
-      explicit Node(const T& weight);
+      explicit Node(const T& val);
       
       // Destructor
       ~Node();
@@ -211,6 +211,86 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    std::ostream& operator<<(std::ostream& out, const DirectedGraph<T>& rhs);
    std::ostream& operator<<(std::ostream& out,
       const DirectedGraph<std::string>& rhs);
+   
+   /** Constructs an empty directed graph, with no nodes. */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph() {}
+   
+   /**
+    * Constructs a directed graph with <i>n</i> nodes. Each node has the
+    * default value of the specified type for the directed graph.
+    *
+    * @param n   the initial number of nodes
+    */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph(const size_t& n)
+   {
+      for (size_t i = 0; i < n; i++) push_back(T());
+   }
+   
+   /**
+    * Constructs a directed graph with <i>n</i> nodes. Each node has the
+    * specified value.
+    *
+    * @param n     the initial number of nodes
+    * @param val   the value of each node
+    */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph(const size_t& n, const T& val)
+   {
+      for (size_t i = 0; i < n; i++) push_back(val);
+   }
+   
+   /**
+    * Constructs a directed graph that contains nodes with each of the elements
+    * in the specified vector.
+    *
+    * @param v   the vector of elements
+    */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph(const std::vector<T>& v)
+   {
+      for (const auto& element : v) push_back(element);
+   }
+   
+   /**
+    * Constructs a directed graph that contains nodes with each of the elements
+    * in the specified initializer list.
+    *
+    * @param il   the initializer list of elements
+    */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph(const std::initializer_list<T> il)
+   {
+      for (const auto& element : il) push_back(element);
+   }
+   
+   /**
+    * Constructs a directed graph with a copy of each of the nodes in the
+    * specified directed graph.
+    *
+    * @param rhs   the directed graph to be copied
+    */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph(const DirectedGraph& rhs) : path_(rhs.path_)
+   {
+      for (const auto& element : rhs.buffer_)
+         buffer_.push_back(std::make_shared<Node>(element -> weight_));
+      
+      for (const auto& element : path_)
+         buffer_[element.head()] -> next_.push_back(buffer_[element.tail()]);
+   }
+   
+   /**
+    * Constructs a directed graph that acquires the nodes in the specified
+    * directed graph. Note that the specified directed graph is left in an
+    * unspecified but valid state.
+    *
+    * @param rhs   the directed graph to be moved
+    */
+   template<typename T>
+   DirectedGraph<T>::DirectedGraph(DirectedGraph&& rhs)
+      : buffer_(std::move(rhs.buffer_)), path_(rhs.path_) {}
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
