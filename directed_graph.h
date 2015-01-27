@@ -752,6 +752,54 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     */
    template<typename T>
    inline size_t DirectedGraph<T>::size() const { return buffer_.size(); }
+   
+   /**
+    * Tests if this directed graph and the specified directed graph are equal.
+    *
+    * @param rhs   the directed graph to compare with this directed graph
+    *
+    * @return <code>true</code> if this directed graph and the specified
+    * directed graph are equal, or <code>false</code> otherwise
+    */
+   template<typename T>
+   bool DirectedGraph<T>::operator==(const DirectedGraph& rhs) const
+   {
+      // Tests if the two directed graphs have the same number of nodes.
+      if (size() != rhs.size()) return false;
+      
+      // Tests if the two directed graphs have the same nodes.
+      for (size_t i = 0; i < size(); i++)
+         if (buffer_[i] -> data_ != rhs.buffer_[i] -> data_) return false;
+      
+      // Tests if the two directed graphs have the same directed edges.
+      if (path_ != rhs.path_) return false;
+      
+      return true;
+   }
+   
+   /**
+    * Tests if this directed graph and the specified directed graph are unequal.
+    *
+    * @param rhs   the directed graph to compare with this directed graph
+    *
+    * @return <code>true</code> if this directed graph and the specified
+    * directed graph are unequal, or <code>false</code> otherwise
+    */
+   template<typename T>
+   bool DirectedGraph<T>::operator!=(const DirectedGraph& rhs) const
+   {
+      // Tests if the two directed graphs have the same number of nodes.
+      if (size() != rhs.size()) return true;
+      
+      // Tests if the two directed graphs have the same nodes.
+      for (size_t i = 0; i < size(); i++)
+         if (buffer_[i] -> data_ != rhs.buffer_[i] -> data_) return true;
+      
+      // Tests if the two directed graphs have the same directed edges.
+      if (path_ != rhs.path_) return true;
+      
+      return false;
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
