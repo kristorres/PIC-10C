@@ -214,7 +214,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    
    /** Constructs an empty directed graph, with no nodes. */
    template<typename T>
-   DirectedGraph<T>::DirectedGraph() {}
+   inline DirectedGraph<T>::DirectedGraph() {}
    
    /**
     * Constructs a directed graph with <i>n</i> nodes. Each node has the
@@ -291,6 +291,55 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    template<typename T>
    DirectedGraph<T>::DirectedGraph(DirectedGraph&& rhs)
       : buffer_(std::move(rhs.buffer_)), path_(rhs.path_) {}
+   
+   /**
+    * Copies all the nodes in the specified directed graph into this directed
+    * graph, with the former preserving its contents.
+    *
+    * @param rhs   the directed graph to be copied
+    *
+    * @return this directed graph after the assignment
+    */
+   template<typename T>
+   DirectedGraph<T>& DirectedGraph<T>::operator=(const DirectedGraph& rhs)
+   {
+      // Tests for self-assignment.
+      if (this != &rhs)
+      {
+         clear();
+         path_ = rhs.path_;
+         
+         for (const auto& element : rhs.buffer_)
+            buffer_.push_back(std::make_shared<Node>(element -> weight_));
+         
+         for (const auto& element : path_)
+            buffer_[element.head()] -> next_.push_back(buffer_[element.tail()]);
+      }
+      
+      return *this;
+   }
+   
+   /**
+    * Moves all the nodes in the specified directed graph into this directed
+    * graph, with the former left in an unspecified but valid state.
+    *
+    * @param rhs   the directed graph to be moved
+    *
+    * @return this directed graph after the assignment
+    */
+   template<typename T>
+   DirectedGraph<T>& DirectedGraph<T>::operator=(DirectedGraph&& rhs)
+   {
+      // Tests for self-assignment.
+      if (this != &rhs)
+      {
+         clear();
+         buffer_ = std::move(rhs.buffer_);
+         path_ = rhs.path_;
+      }
+      
+      return *this;
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
