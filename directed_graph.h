@@ -213,11 +213,9 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       size_t tail_;
    };
    
-   // Directed graph output operators
+   // Directed graph output operator
    template<typename T>
    std::ostream& operator<<(std::ostream& out, const DirectedGraph<T>& rhs);
-   std::ostream& operator<<(std::ostream& out,
-      const DirectedGraph<std::string>& rhs);
    
    /** Constructs an empty directed graph, with no nodes. */
    template<typename T>
@@ -389,7 +387,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    typename DirectedGraph<T>::Iterator DirectedGraph<T>::begin()
    {
       // Tests if the directed graph is empty.
-      if (buffer_.empty()) throw std::logic_error("Empty directed graph");
+      if (empty()) throw std::logic_error("Empty directed graph");
       
       Iterator start;
       start.position_ = buffer_.front();
@@ -405,7 +403,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    void DirectedGraph<T>::clear()
    {
       // Removes all the directed edges.
-      for (size_t i = 0; i < buffer_.size(); i++) disconnect(i);
+      for (size_t i = 0; i < size(); i++) disconnect(i);
       
       buffer_.clear();
    }
@@ -551,7 +549,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    T& DirectedGraph<T>::front()
    {
       // Tests if the directed graph is empty.
-      if (buffer_.empty()) throw std::logic_error("Empty directed graph");
+      if (empty()) throw std::logic_error("Empty directed graph");
       
       return buffer_.front() -> data_;
    }
@@ -595,6 +593,165 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       *this = rhs;
       rhs = chs;
    }
+   
+   /**
+    * Returns the value of the node at position <i>k</i> in this directed
+    * graph.<p>
+    *
+    * The function automatically checks whether <i>k</i> is within the bounds of
+    * valid positions in the directed graph, throwing an
+    * <code>std::out_of_range</code> exception if it is not (i.e., if <i>k</i>
+    * is greater than or equal to the number of nodes in the directed graph).
+    * This is in contrast with member <code>operator[]</code>, which does not
+    * check against bounds.
+    *
+    * @param k   the position of the node
+    *
+    * @return the value of the node at position <i>k</i>
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   T DirectedGraph<T>::at(const size_t& k) const
+   {
+      // Tests if k is valid.
+      test_index(k, "Invalid node index in directed graph: ");
+      
+      return buffer_[k] -> data_;
+   }
+   
+   /**
+    * Tests if this directed graph is empty (i.e., if the directed graph
+    * contains no nodes).
+    *
+    * @return <code>true</code> if this directed graph is empty, or
+    * <code>false</code> otherwise
+    */
+   template<typename T>
+   inline bool DirectedGraph<T>::empty() const { return buffer_.empty(); }
+   
+   /**
+    * Returns the value of the first node in this directed graph.
+    *
+    * @return the value of the first node
+    *
+    * @throws std::out_of_range   if this directed graph is empty
+    */
+   template<typename T>
+   T DirectedGraph<T>::front() const
+   {
+      // Tests if the directed graph is empty.
+      if (empty()) throw std::logic_error("Empty directed graph");
+      
+      return buffer_.front() -> data_;
+   }
+   
+   /**
+    * Returns the <b>indegree</b> of the node at position <i>k</i> in this
+    * directed graph (i.e., the number of head nodes adjacent to the node at
+    * position <i>k</i>).<p>
+    *
+    * The function automatically checks whether <i>k</i> is greater than or
+    * equal to the number of nodes in the directed graph, throwing an
+    * <code>std::out_of_range</code> exception if it is not.
+    *
+    * @param k   the position of the node
+    *
+    * @return the indegree
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   size_t DirectedGraph<T>::indegree(const size_t& k) const
+   {
+      // Tests if k is valid.
+      test_index(k, "Invalid node index in directed graph: ");
+      
+      size_t head = 0;
+      
+      // Counts the number of head nodes adjacent to the given node.
+      for (const auto& row : buffer_)
+      {
+         for (const auto& column : row -> next_)
+            if (column.lock() == buffer_[k]) head++;
+      }
+      
+      return head;
+   }
+   
+   /**
+    * Returns the value of the node at position <i>k</i> in this directed graph.
+    *
+    * @param k   the position of the node
+    *
+    * @return the value of the node at position <i>k</i>
+    */
+   template<typename T>
+   inline T DirectedGraph<T>::operator[](const size_t& k) const
+   {
+      return buffer_[k] -> data_;
+   }
+   
+   /**
+    * Returns the <b>outdegree</b> of the node at position <i>k</i> in this
+    * directed graph (i.e., the number of tail nodes adjacent to the node at
+    * position <i>k</i>).<p>
+    *
+    * The function automatically checks whether <i>k</i> is greater than or
+    * equal to the number of nodes in the directed graph, throwing an
+    * <code>std::out_of_range</code> exception if it is not.
+    *
+    * @param k   the position of the node
+    *
+    * @return the outdegree
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   size_t DirectedGraph<T>::outdegree(const size_t& k) const
+   {
+      // Tests if k is valid.
+      test_index(k, "Invalid node index in directed graph: ");
+      
+      return buffer_[k] -> next_.size();
+   }
+   
+   /**
+    * Tests if this directed graph is simple, that is, if the directed graph has
+    * no loops and no multiple directed edges (edges with the same starting and
+    * ending nodes).
+    *
+    * @return <code>true</code> if this directed graph is simple, or
+    * <code>false</code> otherwise
+    */
+   template<typename T>
+   bool DirectedGraph<T>::simple() const
+   {
+      for (auto i = buffer_.begin(); i != buffer_.end(); i++)
+      {
+         std::vector<std::weak_ptr<Node>>& edge = (*i) -> next_;
+         
+         for (auto j = edge.begin(); j != edge.end(); j++)
+         {
+            // Tests if a node has a loop.
+            if (*i == j -> lock()) return false;
+            
+            // Tests if this directed graph has multiple directed edges.
+            for (auto k = edge.begin(); k != edge.end(); k++)
+               if (j != k && j -> lock() == k -> lock()) return false;
+         }
+      }
+      
+      return true;
+   }
+   
+   /**
+    * Returns the number of nodes in this directed graph.
+    *
+    * @return the number of nodes
+    */
+   template<typename T>
+   inline size_t DirectedGraph<T>::size() const { return buffer_.size(); }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
