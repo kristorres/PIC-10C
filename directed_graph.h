@@ -340,6 +340,10 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
       return *this;
    }
+   
+   /** Destroys this directed graph. */
+   template<typename T>
+   inline DirectedGraph<T>::~DirectedGraph() {}
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
