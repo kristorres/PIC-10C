@@ -18,6 +18,8 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
+#include <algorithm>
 #include <memory>
 #include <initializer_list>
 
@@ -69,13 +71,15 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       void disconnect(const size_t& k);
       void disconnect(const size_t& from, const size_t& to);
       void erase(const size_t& k);
+      T& front();
       T& operator[](const size_t& k);
-      void push_back(const size_t& val);
+      void push_back(const T& val);
       void swap(DirectedGraph& rhs);
       
       // Accessors
       T at(const size_t& k) const;
       bool empty() const;
+      T front() const;
       size_t indegree(const size_t& k) const;
       T operator[](const size_t& k) const;
       size_t outdegree(const size_t& k) const;
@@ -91,6 +95,9 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       // Classes
       class Node;
       class DirectedEdge;
+      
+      // Accessor
+      void test_index(const size_t& k, const std::string& error) const;
       
       /**
        * The vector buffer into which the nodes in this directed graph are
@@ -199,10 +206,10 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
    private:
       
-      /** The starting node index of this directed edge. */
+      /** The position of the starting node for this directed edge. */
       size_t head_;
       
-      /** The ending node index of this directed edge. */
+      /** The position of the ending node for this directed edge. */
       size_t tail_;
    };
    
@@ -275,7 +282,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    DirectedGraph<T>::DirectedGraph(const DirectedGraph& rhs) : path_(rhs.path_)
    {
       for (const auto& element : rhs.buffer_)
-         buffer_.push_back(std::make_shared<Node>(element -> weight_));
+         buffer_.push_back(std::make_shared<Node>(element -> data_));
       
       for (const auto& element : path_)
          buffer_[element.head()] -> next_.push_back(buffer_[element.tail()]);
@@ -310,7 +317,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
          path_ = rhs.path_;
          
          for (const auto& element : rhs.buffer_)
-            buffer_.push_back(std::make_shared<Node>(element -> weight_));
+            buffer_.push_back(std::make_shared<Node>(element -> data_));
          
          for (const auto& element : path_)
             buffer_[element.head()] -> next_.push_back(buffer_[element.tail()]);
@@ -344,6 +351,250 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    /** Destroys this directed graph. */
    template<typename T>
    inline DirectedGraph<T>::~DirectedGraph() {}
+   
+   /**
+    * Returns a reference to the value of the node at position <i>k</i> in this
+    * directed graph.<p>
+    *
+    * The function automatically checks whether <i>k</i> is within the bounds of
+    * valid positions in the directed graph, throwing an
+    * <code>std::out_of_range</code> exception if it is not (i.e., if <i>k</i>
+    * is greater than or equal to the number of nodes in the directed graph).
+    * This is in contrast with member <code>operator[]</code>, which does not
+    * check against bounds.
+    *
+    * @param k   the position of the node
+    *
+    * @return a reference to the value of the node at position <i>k</i>
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   T& DirectedGraph<T>::at(const size_t& k)
+   {
+      // Tests if k is valid.
+      test_index(k, "Invalid node index in directed graph: ");
+      
+      return buffer_[k] -> data_;
+   }
+   
+   /**
+    * Returns an iterator pointing to the first node in this directed graph.
+    *
+    * @return an iterator pointing to the first node
+    *
+    * @throws std::out_of_range   if this directed graph is empty
+    */
+   template<typename T>
+   typename DirectedGraph<T>::Iterator DirectedGraph<T>::begin()
+   {
+      // Tests if the directed graph is empty.
+      if (buffer_.empty()) throw std::logic_error("Empty directed graph");
+      
+      Iterator start;
+      start.position_ = buffer_.front();
+      start.container_ = this;
+      return start;
+   }
+   
+   /**
+    * Removes all nodes from this directed graph, leaving the directed graph
+    * with no nodes.
+    */
+   template<typename T>
+   void DirectedGraph<T>::clear()
+   {
+      // Removes all the directed edges.
+      for (size_t i = 0; i < buffer_.size(); i++) disconnect(i);
+      
+      buffer_.clear();
+   }
+   
+   /**
+    * Connects a directed edge from the specified starting node to the specified
+    * ending node in this directed graph.<p>
+    *
+    * The function automatically checks whether <code>from</code> and
+    * <code>to</code> are greater than or equal to the number of nodes in the
+    * directed graph, throwing an <code>std::out_of_range</code> exception if it
+    * is not.
+    *
+    * @param from   the position of the starting node
+    * @param to     the position of the ending node
+    *
+    * @throws std::out_of_range   if either <code>from</code> or <code>to</code>
+    * is out of bounds
+    */
+   template<typename T>
+   void DirectedGraph<T>::connect(const size_t& from, const size_t& to)
+   {
+      // Tests if the starting and ending node indices are valid.
+      test_index(from, "Invalid starting node index in directed graph: ");
+      test_index(to, "Invalid ending node index in directed graph: ");
+      
+      buffer_[from] -> next_.push_back(buffer_[to]);
+      path_.push_back(DirectedEdge(from, to));
+      std::stable_sort(path_.begin(), path_.end());
+   }
+   
+   /**
+    * Disconnects all head nodes and all tail nodes adjacent to the node at
+    * position <i>k</i> in this directed graph.<p>
+    *
+    * The function automatically checks whether <i>k</i> is greater than or
+    * equal to the number of nodes in the directed graph, throwing an
+    * <code>std::out_of_range</code> exception if it is not.
+    *
+    * @param k   the position of the node
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   void DirectedGraph<T>::disconnect(const size_t& k)
+   {
+      // Tests if k is valid.
+      test_index(k, "Invalid node index in directed graph: ");
+      
+      buffer_[k] -> next_.clear();
+      
+      // Removes all the directed edges whose ending node is the given node.
+      for (auto& element : buffer_)
+      {
+         std::vector<std::weak_ptr<Node>>& edge = element -> next_;
+         
+         for (auto pos = edge.begin(); pos != edge.end(); pos++)
+            if (pos -> lock() == buffer_[k]) { edge.erase(pos); pos--; }
+      }
+      
+      auto test = [&](const DirectedEdge& e)
+      {
+         return e.head() == k || e.tail() == k;
+      };
+      
+      path_.erase(std::remove_if(path_.begin(), path_.end(), test),
+         path_.end());
+   }
+   
+   /**
+    * Disconnects a directed edge from the specified starting node to the
+    * specified ending node in this directed graph.<p>
+    *
+    * The function automatically checks whether <code>from</code> and
+    * <code>to</code> are greater than or equal to the number of nodes in the
+    * directed graph, throwing an <code>std::out_of_range</code> exception if it
+    * is not.
+    *
+    * @param from   the position of the starting node
+    * @param to     the position of the ending node
+    *
+    * @throws std::out_of_range   if either <code>from</code> or <code>to</code>
+    * is out of bounds
+    */
+   template<typename T>
+   void DirectedGraph<T>::disconnect(const size_t& from, const size_t& to)
+   {
+      // Tests if the starting and ending node indices are valid.
+      test_index(from, "Invalid starting node index in directed graph: ");
+      test_index(to, "Invalid ending node index in directed graph: ");
+      
+      // Removes the rightmost occurrence of the given directed edge.
+      std::vector<std::weak_ptr<Node>>& edge = buffer_[from] -> next_;
+      
+      for (size_t i = edge.size(); i > 0; i--)
+      {
+         if (edge[i - 1].lock() == buffer_[to])
+         {
+            edge.erase(edge.begin() + i - 1);
+            break;
+         }
+      }
+      
+      for (size_t i = path_.size(); i > 0; i--)
+      {
+         if (path_[i - 1] == DirectedEdge(from, to))
+         {
+            path_.erase(path_.begin() + i - 1);
+            return;
+         }
+      }
+   }
+   
+   /**
+    * Removes the node at position <i>k</i> from this directed graph.<p>
+    *
+    * The function automatically checks whether <i>k</i> is greater than or
+    * equal to the number of nodes in the directed graph, throwing an
+    * <code>std::out_of_range</code> exception if it is not.
+    *
+    * @param k   the position of the node
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   void DirectedGraph<T>::erase(const size_t& k)
+   {
+      // Tests if k is valid.
+      test_index(k, "Invalid node index in directed graph: ");
+      
+      disconnect(k);
+      buffer_.erase(buffer_.begin() + k);
+   }
+   
+   /**
+    * Returns a reference to the value of the first node in this directed graph.
+    *
+    * @return a reference to the value of the first node
+    *
+    * @throws std::out_of_range   if this directed graph is empty
+    */
+   template<typename T>
+   T& DirectedGraph<T>::front()
+   {
+      // Tests if the directed graph is empty.
+      if (buffer_.empty()) throw std::logic_error("Empty directed graph");
+      
+      return buffer_.front() -> data_;
+   }
+   
+   /**
+    * Returns a reference to the value of the node at position <i>k</i> in this
+    * directed graph.
+    *
+    * @param k   the position of the node
+    *
+    * @return a reference to the value of the node at position <i>k</i>
+    */
+   template<typename T>
+   inline T& DirectedGraph<T>::operator[](const size_t& k)
+   {
+      return buffer_[k] -> data_;
+   }
+   
+   /**
+    * Adds a node with the specified value to this directed graph, after its
+    * current last node.
+    *
+    * @param val   the value of the new node
+    */
+   template<typename T>
+   inline void DirectedGraph<T>::push_back(const T& val)
+   {
+      buffer_.push_back(std::make_shared<Node>(val));
+   }
+   
+   /**
+    * Exchanges the content of this directed graph with the content of the
+    * specified directed graph.
+    *
+    * @param rhs   the directed graph to be swapped
+    */
+   template<typename T>
+   void DirectedGraph<T>::swap(DirectedGraph<T>& rhs)
+   {
+      DirectedGraph<T> chs = *this;
+      *this = rhs;
+      rhs = chs;
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
