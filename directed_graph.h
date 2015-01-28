@@ -370,7 +370,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return a reference to the value of the node at position <i>k</i>
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    T& DirectedGraph<T>::at(const size_t& k)
@@ -386,7 +386,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return an iterator pointing to the first node
     *
-    * @throws std::out_of_range   if this directed graph is empty
+    * @throws std::out_of_range if this directed graph is empty
     */
    template<typename T>
    typename DirectedGraph<T>::Iterator DirectedGraph<T>::begin()
@@ -425,7 +425,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     * @param from   the position of the starting node
     * @param to     the position of the ending node
     *
-    * @throws std::out_of_range   if either <code>from</code> or <code>to</code>
+    * @throws std::out_of_range if either <code>from</code> or <code>to</code>
     * is out of bounds
     */
    template<typename T>
@@ -450,7 +450,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @param k   the position of the node
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    void DirectedGraph<T>::disconnect(const size_t& k)
@@ -490,7 +490,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     * @param from   the position of the starting node
     * @param to     the position of the ending node
     *
-    * @throws std::out_of_range   if either <code>from</code> or <code>to</code>
+    * @throws std::out_of_range if either <code>from</code> or <code>to</code>
     * is out of bounds
     */
    template<typename T>
@@ -531,7 +531,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @param k   the position of the node
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    void DirectedGraph<T>::erase(const size_t& k)
@@ -548,7 +548,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return a reference to the value of the first node
     *
-    * @throws std::out_of_range   if this directed graph is empty
+    * @throws std::out_of_range if this directed graph is empty
     */
    template<typename T>
    T& DirectedGraph<T>::front()
@@ -614,7 +614,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return the value of the node at position <i>k</i>
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    T DirectedGraph<T>::at(const size_t& k) const
@@ -640,7 +640,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return the value of the first node
     *
-    * @throws std::out_of_range   if this directed graph is empty
+    * @throws std::out_of_range if this directed graph is empty
     */
    template<typename T>
    T DirectedGraph<T>::front() const
@@ -664,7 +664,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return the indegree
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    size_t DirectedGraph<T>::indegree(const size_t& k) const
@@ -710,7 +710,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     *
     * @return the outdegree
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    size_t DirectedGraph<T>::outdegree(const size_t& k) const
@@ -815,7 +815,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     * @param k       the position of the node
     * @param error   the error message
     *
-    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    * @throws std::out_of_range if <i>k</i> is out of bounds
     */
    template<typename T>
    void DirectedGraph<T>::test_index(const size_t& k, const std::string& error) const
@@ -826,12 +826,60 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    
    /** Constructs an iterator that does not point into any directed graph. */
    template<typename T>
-   DirectedGraph<T>::Iterator::Iterator()
+   inline DirectedGraph<T>::Iterator::Iterator()
       : position_(nullptr), container_(nullptr) {}
    
    /** Destroys this iterator. */
    template<typename T>
-   DirectedGraph<T>::Iterator::~Iterator() {}
+   inline DirectedGraph<T>::Iterator::~Iterator() {}
+   
+   /**
+    * Moves this iterator to the <i>k</i><sup>th</sup> tail node.<p>
+    *
+    * The function automatically checks whether <i>k</i> is greater than or
+    * equal to the outdegree of the node to which this iterator points, throwing
+    * an <code>std::out_of_range</code> exception if it is not.
+    *
+    * @param k    the tail node index
+    *
+    * @throws std::logic_error if this iterator does not point into any directed
+    * graph
+    * @throws std::out_of_range if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   void DirectedGraph<T>::Iterator::next(const size_t& k)
+   {
+      // Tests if this iterator points into a directed graph.
+      if (position_ == nullptr)
+         throw std::logic_error("Iterator does not point to a directed graph");
+      
+      // Tests if k is valid.
+      if (k >= outdegree())
+      {
+         throw std::out_of_range("Invalid tail node index for iterator: "
+            + boost::lexical_cast<std::string>(k));
+      }
+      
+      position_ = position_ -> next_[k].lock();
+   }
+   
+   /**
+    * Returns a reference to the value at the current position of this iterator.
+    *
+    * @return a reference to the value of the node to which this iterator points
+    *
+    * @throws std::logic_error if this iterator does not point into any directed
+    * graph
+    */
+   template<typename T>
+   T& DirectedGraph<T>::Iterator::operator*()
+   {
+      // Tests if this iterator points into a directed graph.
+      if (position_ == nullptr)
+         throw std::logic_error("Iterator does not point to a directed graph");
+      
+      return position_ -> data_;
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
