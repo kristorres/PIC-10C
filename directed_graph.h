@@ -967,6 +967,18 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     */
    template<typename T>
    inline DirectedGraph<T>::Node::Node(const T& val) : data_(val) {}
+   
+   /**
+    * Constructs a directed edge with the specified starting node and the
+    * specified ending node.
+    *
+    * @param from   the position of the starting node
+    * @param to     the position of the ending node
+    */
+   template<typename T>
+   inline DirectedGraph<T>::DirectedEdge::DirectedEdge(const size_t& head,
+      const size_t& tail)
+      : head_(head), tail_(tail) {}
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
