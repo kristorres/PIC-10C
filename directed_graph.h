@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <memory>
 #include <initializer_list>
+#include "boost/lexical_cast.hpp"
 
 /**
  * The <code>Kris_Torres_UCLA_PIC_10C_Winter_2014</code> namespace contains the
@@ -114,7 +115,11 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    
    /**
     * <i>Iterators</i> are objects that point to some nodes in a directed graph
-    * and have the ability to traverse through the nodes in that directed graph.
+    * and have the ability to traverse through the nodes in that directed
+    * graph.<p>
+    *
+    * The iterators for the <code>DirectedGraph</code> class are not compatible
+    * with any STL algorithm since <code>operator++</code> is not implemented.
     *
     * @author Kris Torres
     */
@@ -387,7 +392,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    typename DirectedGraph<T>::Iterator DirectedGraph<T>::begin()
    {
       // Tests if the directed graph is empty.
-      if (empty()) throw std::logic_error("Empty directed graph");
+      if (empty()) throw std::out_of_range("Empty directed graph");
       
       Iterator start;
       start.position_ = buffer_.front();
@@ -549,7 +554,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    T& DirectedGraph<T>::front()
    {
       // Tests if the directed graph is empty.
-      if (empty()) throw std::logic_error("Empty directed graph");
+      if (empty()) throw std::out_of_range("Empty directed graph");
       
       return buffer_.front() -> data_;
    }
@@ -641,7 +646,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    T DirectedGraph<T>::front() const
    {
       // Tests if the directed graph is empty.
-      if (empty()) throw std::logic_error("Empty directed graph");
+      if (empty()) throw std::out_of_range("Empty directed graph");
       
       return buffer_.front() -> data_;
    }
@@ -800,6 +805,29 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
       return false;
    }
+   
+   /**
+    * Tests if <i>k</i> is within the bounds of valid positions in the directed
+    * graph, throwing an <code>std::out_of_range</code> exception if it is not
+    * (i.e., if <i>k</i> is greater than or equal to the number of nodes in the
+    * directed graph).
+    *
+    * @param k       the position of the node
+    * @param error   the error message
+    *
+    * @throws std::out_of_range   if <i>k</i> is out of bounds
+    */
+   template<typename T>
+   void DirectedGraph<T>::test_index(const size_t& k, const std::string& error) const
+   {
+      if (k >= size())
+         throw std::out_of_range(error + boost::lexical_cast<std::string>(k));
+   }
+   
+   /** Constructs an iterator that does not point into any directed graph. */
+   template<typename T>
+   DirectedGraph<T>::Iterator::Iterator()
+      : position_(nullptr), container_(nullptr) {}
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
