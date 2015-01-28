@@ -110,7 +110,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
        * The vector buffer into which the directed edges in this directed graph
        * are stored.
        */
-      std::vector<DirectedGraph> path_;
+      std::vector<DirectedEdge> path_;
    };
    
    /**
@@ -172,9 +172,6 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
       // Constructor
       explicit Node(const T& val);
-      
-      // Destructor
-      ~Node();
       
       // Friends
       friend class DirectedGraph<T>;
@@ -962,6 +959,14 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    {
       return position_ != rhs.position_;
    }
+   
+   /**
+    * Constructs a node with the specified value.
+    *
+    * @param val   the value to store in this node
+    */
+   template<typename T>
+   inline DirectedGraph<T>::Node::Node(const T& val) : data_(val) {}
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
