@@ -828,6 +828,10 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    template<typename T>
    DirectedGraph<T>::Iterator::Iterator()
       : position_(nullptr), container_(nullptr) {}
+   
+   /** Destroys this iterator. */
+   template<typename T>
+   DirectedGraph<T>::Iterator::~Iterator() {}
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
