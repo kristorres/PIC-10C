@@ -934,6 +934,34 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
       return position_ -> next_.size();
    }
+   
+   /**
+    * Tests if this iterator and the specified iterator are equal.
+    *
+    * @param rhs   the iterator to compare with this iterator
+    *
+    * @return <code>true</code> if this iterator and the specified iterator are
+    * equal, or <code>false</code> otherwise
+    */
+   template<typename T>
+   inline bool DirectedGraph<T>::Iterator::operator==(const Iterator& rhs) const
+   {
+      return position_ == rhs.position_;
+   }
+   
+   /**
+    * Tests if this iterator and the specified iterator are unequal.
+    *
+    * @param rhs   the iterator to compare with this iterator
+    *
+    * @return <code>true</code> if this iterator and the specified iterator are
+    * unequal, or <code>false</code> otherwise
+    */
+   template<typename T>
+   inline bool DirectedGraph<T>::Iterator::operator!=(const Iterator& rhs) const
+   {
+      return position_ != rhs.position_;
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
