@@ -880,6 +880,60 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       
       return position_ -> data_;
    }
+   
+   /**
+    * Returns the value at the current position of this iterator.
+    *
+    * @return the value of the node to which this iterator points
+    *
+    * @throws std::logic_error if this iterator does not point into any directed
+    * graph
+    */
+   template<typename T>
+   T DirectedGraph<T>::Iterator::operator*() const
+   {
+      // Tests if this iterator points into a directed graph.
+      if (position_ == nullptr)
+         throw std::logic_error("Iterator does not point to a directed graph");
+      
+      return position_ -> data_;
+   }
+   
+   /**
+    * Returns a pointer to the value at the current position of this iterator.
+    *
+    * @return a pointer to the value of the node to which this iterator points
+    *
+    * @throws std::logic_error if this iterator does not point into any directed
+    * graph
+    */
+   template<typename T>
+   T* DirectedGraph<T>::Iterator::operator->() const
+   {
+      // Tests if this iterator points into a directed graph.
+      if (position_ == nullptr)
+         throw std::logic_error("Iterator does not point to a directed graph");
+      
+      return &position_ -> data_;
+   }
+   
+   /**
+    * Returns the outdegree at the current position of this iterator.
+    *
+    * @return the outdegree of the node to which this iterator points
+    *
+    * @throws std::logic_error if this iterator does not point into any directed
+    * graph
+    */
+   template<typename T>
+   size_t DirectedGraph<T>::Iterator::outdegree() const
+   {
+      // Tests if this iterator points into a directed graph.
+      if (position_ == nullptr)
+         throw std::logic_error("Iterator does not point to a directed graph");
+      
+      return position_ -> next_.size();
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
