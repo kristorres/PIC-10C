@@ -979,6 +979,22 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
    inline DirectedGraph<T>::DirectedEdge::DirectedEdge(const size_t& head,
       const size_t& tail)
       : head_(head), tail_(tail) {}
+   
+   /**
+    * Returns the position of the starting node for this directed edge.
+    *
+    * @return the position of the starting node
+    */
+   template<typename T>
+   inline size_t DirectedGraph<T>::DirectedEdge::head() const { return head_; }
+   
+   /**
+    * Returns the position of the ending node for this directed edge.
+    *
+    * @return the position of the ending node
+    */
+   template<typename T>
+   inline size_t DirectedGraph<T>::DirectedEdge::tail() const { return tail_; }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
