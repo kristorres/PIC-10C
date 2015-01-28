@@ -995,6 +995,40 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
     */
    template<typename T>
    inline size_t DirectedGraph<T>::DirectedEdge::tail() const { return tail_; }
+   
+   /**
+    * Tests if the positions of the starting and ending nodes for this directed
+    * edge are equal to those of the specified directed edge.
+    *
+    * @param rhs   the directed edge to compare with this directed edge
+    *
+    * @return <code>true</code> if the positions of the starting and ending
+    * nodes for this directed edge are equal to those of the specified directed
+    * edge, or <code>false</code> otherwise
+    */
+   template<typename T>
+   inline bool DirectedGraph<T>::DirectedEdge
+      ::operator==(const DirectedEdge& rhs) const
+   {
+      return head_ == rhs.head_ && tail_ == rhs.tail_;
+   }
+   
+   /**
+    * Tests if the position of the starting node for this directed edge is less
+    * than that of the specified directed edge.
+    *
+    * @param rhs   the directed edge to compare with this directed edge
+    *
+    * @return <code>true</code> if the position of the starting node for this
+    * directed edge is less than that of the specified directed edge, or
+    * <code>false</code> otherwise
+    */
+   template<typename T>
+   inline bool DirectedGraph<T>::DirectedEdge
+      ::operator<(const DirectedEdge& rhs) const
+   {
+      return head_ < rhs.head_;
+   }
 }
 
 #endif   // PIC_10C_DIRECTED_GRAPH_H_
