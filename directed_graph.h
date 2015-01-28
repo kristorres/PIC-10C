@@ -91,6 +91,11 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       bool operator==(const DirectedGraph& rhs) const;
       bool operator!=(const DirectedGraph& rhs) const;
       
+      // Friend
+      template<typename U>
+      friend std::ostream& operator<<(std::ostream& out,
+         const DirectedGraph<U>& rhs);
+      
    private:
       
       // Classes
@@ -735,7 +740,7 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
          
          for (auto j = edge.begin(); j != edge.end(); j++)
          {
-            // Tests if a node has a loop.
+            // Tests if the current node has a loop.
             if (*i == j -> lock()) return false;
             
             // Tests if this directed graph has multiple directed edges.
@@ -1028,6 +1033,34 @@ namespace Kris_Torres_UCLA_PIC_10C_Winter_2014
       ::operator<(const DirectedEdge& rhs) const
    {
       return head_ < rhs.head_;
+   }
+   
+   /**
+    * Outputs the specified directed graph with the specified output stream.
+    *
+    * @param out   the output stream
+    * @param rhs   the directed graph to be outputted
+    *
+    * @return the stream after the output
+    */
+   template<typename T>
+   std::ostream& operator<<(std::ostream& out, const DirectedGraph<T>& rhs)
+   {
+      for (size_t i = 0; i < rhs.size(); i++)
+      {
+         // Outputs the current node by itself if it is disconnected.
+         if (rhs.indegree(i) == 0 && rhs.outdegree(i) == 0)
+            out << rhs[i] << std::endl;
+         
+         // Outputs the starting and ending nodes for each directed edge.
+         else
+         {
+            for (const auto& element : rhs.buffer_[i] -> next_)
+               out << rhs[i] << " -> " << element.lock() -> data_ << std::endl;
+         }
+      }
+      
+      return out;
    }
 }
 
